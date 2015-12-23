@@ -1,6 +1,10 @@
 
 """
 2D Autocorrelation
+
+This method needs to be improved, read:
+LIU ET AL.: A COMPUTATIONAL MODEL FOR PERIODIC PATTERN PERCEPTION BASED ON FRIEZE AND WALLPAPER GROUPS
+
 """
 
 import numpy as np
