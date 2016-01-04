@@ -4,8 +4,13 @@ GLWidget
 """
 
 import sys
+#import pdb
+
 from PyQt4 import QtCore, QtGui, QtOpenGL
 from PyQt4.QtOpenGL import QGLShaderProgram, QGLShader, QGLFormat, QGLContext, QGLWidget
+from PyQt4.QtGui import QMatrix4x4
+
+from Utility import *
 
 """
 Importing OpenGL
@@ -55,9 +60,9 @@ class GLWidget(QtOpenGL.QGLWidget):
         self._shaderProgram.bind() # or link()
         
         
-        self._mvpMatrixLocation = self._shaderProgram.uniformLocation("mvpMatrix")
-        self._colorLocation = self._shaderProgram.attributeLocation("vertexColor")
-        self._vertexLocation = self._shaderProgram.attributeLocation("vert")
+        self._mvpMatrixLocation  = self._shaderProgram.uniformLocation("mvpMatrix")
+        self._colorLocation      = self._shaderProgram.attributeLocation("vertexColor")
+        self._vertexLocation     = self._shaderProgram.attributeLocation("vert")
         self._use_color_location = self._shaderProgram.uniformLocation("use_color")
                 
         
@@ -70,8 +75,35 @@ class GLWidget(QtOpenGL.QGLWidget):
         #print self.height()
     
     def paintGL(self):
+        print "paint"
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-        GL.glLoadIdentity()
         
-    #def updateGL(self):
-    #    print "Update"
+        GL.glViewport(0, 0, self.width(),  self.height())  
+        
+        #pdb.set_trace()
+        
+        #orthoMatrix = QMatrix4x4.ortho(0.0, self.width(), self.height(), 0, -100, 100)
+        #transformMatrix = QMatrix4x4.setToIdentity()
+        #self._shaderProgram.setUniformValue(self._mvpMatrixLocation, orthoMatrix * transformMatrix)
+        
+        #print orthoMatrix
+        #print transformMatrix        
+        #GL.glLoadIdentity()
+        
+    def updateGL(self):
+        pass
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        

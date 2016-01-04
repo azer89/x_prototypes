@@ -31,3 +31,7 @@ if __name__ == '__main__':
     
     if app_created:
         app.exec_()
+
+    # issue:
+    # http://stackoverflow.com/questions/15861839/error-upon-app-shutdown-qglcontextmakecurrent-cannot-make-invalid-context-cu
+    #app.instance().aboutToQuit.connect( window.DeleteGLWidget() )
