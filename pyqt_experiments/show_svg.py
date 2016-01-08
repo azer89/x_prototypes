@@ -1,11 +1,12 @@
 
 import sys
+
 from PyQt4.QtGui import *
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtSvg import QSvgWidget
 
-from PyQt4.QtGui import QApplication, QGraphicsScene, QGraphicsView
-from PyQt4.QtWebKit import QGraphicsWebView
+#from PyQt4.QtGui import QApplication, QGraphicsScene, QGraphicsView
+#from PyQt4.QtWebKit import QGraphicsWebView
 
 app_created = False
 
