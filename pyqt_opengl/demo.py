@@ -1,4 +1,4 @@
-import ctypes
+
 
 import numpy
 from OpenGL.GL import *
@@ -58,10 +58,14 @@ class MyWidget(QtOpenGL.QGLWidget):
         self._shaderProgram.link()
 
         self._mvpMatrixLocation  = self._shaderProgram.uniformLocation("mvpMatrix")
-        self._colorLocation      = self._shaderProgram.attributeLocation("color");
-        self._vertexLocation     = self._shaderProgram.attributeLocation("position");
-        self._use_color_location = self._shaderProgram.uniformLocation("use_color");
-        self._texCoordLocation   = self._shaderProgram.attributeLocation("uv");
+
+        self._colorLocation      = self._shaderProgram.attributeLocation("color")
+        self._vertexLocation     = self._shaderProgram.attributeLocation("position")
+        self._texCoordLocation   = self._shaderProgram.attributeLocation("uv")
+
+        self._use_color_location = self._shaderProgram.uniformLocation("use_color")
+
+
 
         """
         vertexData = numpy.array([
@@ -94,16 +98,20 @@ class MyWidget(QtOpenGL.QGLWidget):
                                 dtype=numpy.float32)
         """
 
-        vertexData = numpy.array([
-                                20.0, 20,   0.0, 1.0,
-                                500,  10.0, 0.0, 1.0,
-                                10,   100,  0.0, 1.0,
+        # UV still doesn't work
+        
+        vertexData = numpy.array([ 20.0,  20.0, 0.0, 1.0,
+                                  500.0,  10.0, 0.0, 1.0,
+                                   10.0, 100.0, 0.0, 1.0,
 
-                                0.0, 1.0, 0.0, 1.0,
-                                0.0, 1.0, 0.0, 1.0,
-                                0.0, 1.0, 0.0, 1.0,],
+                                    0.0,   1.0, 0.0, 1.0,
+                                    0.0,   1.0, 0.0, 1.0,
+                                    0.0,   1.0, 0.0, 1.0,
 
-                                dtype=numpy.float32)
+                                    1.0, 0.0,
+                                    1.0, 1.0,
+                                    0.0, 0.0,],
+                                    dtype=numpy.float32)
 
 
         # create VAO
@@ -124,8 +132,10 @@ class MyWidget(QtOpenGL.QGLWidget):
 
         glEnableVertexAttribArray(self._vertexLocation)
         glEnableVertexAttribArray(self._colorLocation)
-        glVertexAttribPointer(self._vertexLocation, 4, GL_FLOAT, GL_FALSE, 0, None)
-        glVertexAttribPointer(self._colorLocation, 4, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(48))
+        #glEnableVertexAttribArray(self._texCoordLocation) # probably not glEnableVertexAttribArray ???
+        glVertexAttribPointer(self._vertexLocation,   4, GL_FLOAT, GL_FALSE, 0, None)
+        glVertexAttribPointer(self._colorLocation,    4, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(48))
+        #glVertexAttribPointer(self._texCoordLocation, 2, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(96))
 
         glBindBuffer(GL_ARRAY_BUFFER, 0)
         glBindVertexArray(0)
