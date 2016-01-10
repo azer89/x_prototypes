@@ -121,6 +121,8 @@ class MyWidget(QtOpenGL.QGLWidget):
         # create VBO
         VBO = glGenBuffers(1)
         glBindBuffer(GL_ARRAY_BUFFER, VBO)
+
+
         glBufferData(GL_ARRAY_BUFFER, vertexData.nbytes, vertexData, GL_STATIC_DRAW)
 
         """
@@ -131,10 +133,14 @@ class MyWidget(QtOpenGL.QGLWidget):
         """
 
         glEnableVertexAttribArray(self._vertexLocation)
-        glEnableVertexAttribArray(self._colorLocation)
-        #glEnableVertexAttribArray(self._texCoordLocation) # probably not glEnableVertexAttribArray ???
         glVertexAttribPointer(self._vertexLocation,   4, GL_FLOAT, GL_FALSE, 0, None)
+
+        glBufferData(GL_ARRAY_BUFFER, vertexData.nbytes, vertexData, GL_STATIC_DRAW)
+
+        glEnableVertexAttribArray(self._colorLocation)
         glVertexAttribPointer(self._colorLocation,    4, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(48))
+
+        #glEnableVertexAttribArray(self._texCoordLocation) # probably not glEnableVertexAttribArray ???
         #glVertexAttribPointer(self._texCoordLocation, 2, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(96))
 
         glBindBuffer(GL_ARRAY_BUFFER, 0)
