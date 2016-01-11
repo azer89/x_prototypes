@@ -8,15 +8,10 @@ from PyQt4.QtOpenGL import QGLShaderProgram, QGLShader
 from PyQt4.QtGui import QMatrix4x4
 
 VERTEX_SHADER = """#version 330
-
-//layout (location=0) in vec4 position;
-//layout (location=1) in vec4 color;
-//layout (location=2) in vec2 uv;
-in vec4 position;
-in vec4 color;
 in vec2 uv;
+in vec4 position;
 
-
+in vec4 color;
 out vec2 theUV;
 out vec4 theColor;
 
@@ -35,17 +30,21 @@ in vec2 theUV;
 in vec4 theColor;
 out vec4 outputColor;
 
-//uniform float lolol;
 uniform float use_color;
+uniform sampler2D base_texture;
 
 void main()
 {
-    outputColor = theColor;
-    //outputColor = vec4(lolol, 0.0, 0.0, 1.0);
+    outputColor = texture2D(base_texture, theUV);
+    if(use_color > 0.5)
+    {
+     	outputColor = theColor;
+    }
 }
 """
 
 class MyWidget(QtOpenGL.QGLWidget):
+
     def initializeGL(self):
         glViewport(0, 0, self.width(), self.height())
 
@@ -54,97 +53,84 @@ class MyWidget(QtOpenGL.QGLWidget):
             print "Vertex shader OK"
         if self._shaderProgram.addShaderFromSourceCode(QGLShader.Fragment, FRAGMENT_SHADER) :
             print "Fragment shader OK"
-        print self._shaderProgram.log()
+
         self._shaderProgram.link()
+
+
 
         self._mvpMatrixLocation  = self._shaderProgram.uniformLocation("mvpMatrix")
 
         self._colorLocation      = self._shaderProgram.attributeLocation("color")
         self._vertexLocation     = self._shaderProgram.attributeLocation("position")
-        self._texCoordLocation   = self._shaderProgram.attributeLocation("uv")
+        self._texCoordLocation   = self._shaderProgram.attributeLocation("uv_pos")
+
+        print self._colorLocation
+        print self._vertexLocation
+        print self._texCoordLocation
 
         self._use_color_location = self._shaderProgram.uniformLocation("use_color")
 
 
-
-        """
-        vertexData = numpy.array([
-                                0.0, 50, 0.0, 1.0,
-                                50, -36.6, 0.0, 1.0,
-                                -50, -36.6, 0.0, 1.0,
-
-                                0.0,   35, 0.0, 1.0,
-                                35, -23.66, 0.0, 1.0,
-                                -35, -23.66, 0.0, 1.0,
-
-                                -20, 15, 0.0, 1.0,
-                                15, -43.66, 0.0, 1.0,
-                                -55, -43.66, 0.0, 1.0,
-
-                                1.0, 1.0, 1.0, 1.0,
-                                1.0, 1.0, 0.0, 1.0,
-                                1.0, 0.0, 1.0, 1.0,
-
-                                1.0, 0.0, 0.0, 1.0,
-                                1.0, 0.0, 0.0, 1.0,
-                                1.0, 0.0, 0.0, 1.0,
-
-                                0.0, 1.0, 0.0, 1.0,
-                                0.0, 1.0, 0.0, 1.0,
-                                0.0, 1.0, 0.0, 1.0,
-
-                                ],
-
-                                dtype=numpy.float32)
-        """
-
-        # UV still doesn't work
-        
         vertexData = numpy.array([ 20.0,  20.0, 0.0, 1.0,
                                   500.0,  10.0, 0.0, 1.0,
                                    10.0, 100.0, 0.0, 1.0,
 
-                                    0.0,   1.0, 0.0, 1.0,
-                                    0.0,   1.0, 0.0, 1.0,
-                                    0.0,   1.0, 0.0, 1.0,
-
-                                    1.0, 0.0,
-                                    1.0, 1.0,
-                                    0.0, 0.0,],
+                                   0.0, 1.0,
+                                   1.0, 1.0,
+                                   1.0, 1.0],
                                     dtype=numpy.float32)
 
+        colorData = numpy.array([0.0,   1.0, 0.0, 1.0,
+                                 0.0,   1.0, 0.0, 1.0,
+                                 0.0,   1.0, 0.0, 1.0],
+                                 dtype=numpy.float32)
+
+        """
+        uvData = numpy.array([0.0, 1.0,
+                              1.0, 1.0,
+                              1.0, 1.0],
+                              dtype=numpy.float32)
+        """
 
         # create VAO
         self.VAO = glGenVertexArrays(1)
         glBindVertexArray(self.VAO)
 
-        # create VBO
-        VBO = glGenBuffers(1)
-        glBindBuffer(GL_ARRAY_BUFFER, VBO)
-
-
+        # create position VBO
+        posVBO = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, posVBO)
         glBufferData(GL_ARRAY_BUFFER, vertexData.nbytes, vertexData, GL_STATIC_DRAW)
-
-        """
-        glEnableVertexAttribArray(0)
-        glEnableVertexAttribArray(1)
-        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, None)
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(48))
-        """
-
         glEnableVertexAttribArray(self._vertexLocation)
         glVertexAttribPointer(self._vertexLocation,   4, GL_FLOAT, GL_FALSE, 0, None)
 
-        glBufferData(GL_ARRAY_BUFFER, vertexData.nbytes, vertexData, GL_STATIC_DRAW)
+        #glVertexAttribPointer(self._colorLocation,    4, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(48))
+        #glEnableVertexAttribArray(self._texCoordLocation)
+        #glVertexAttribPointer(self._texCoordLocation,    4, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(48))
 
+        # create color VBO
+        colVBO = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, colVBO)
+        glBufferData(GL_ARRAY_BUFFER, colorData.nbytes, colorData, GL_STATIC_DRAW)
         glEnableVertexAttribArray(self._colorLocation)
-        glVertexAttribPointer(self._colorLocation,    4, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(48))
+        glVertexAttribPointer(self._colorLocation,    4, GL_FLOAT, GL_FALSE, 0, None)
 
-        #glEnableVertexAttribArray(self._texCoordLocation) # probably not glEnableVertexAttribArray ???
-        #glVertexAttribPointer(self._texCoordLocation, 2, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(96))
+        # create UV VBO
 
+        """
+        uvVBO = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, uvVBO)
+        glBufferData(GL_ARRAY_BUFFER, uvData.nbytes, uvData, GL_STATIC_DRAW)
+        glEnableVertexAttribArray(self._texCoordLocation)
+        glVertexAttribPointer(self._texCoordLocation,    2, GL_FLOAT, GL_FALSE, 0, None)
+        """
+
+        # unbind vao
         glBindBuffer(GL_ARRAY_BUFFER, 0)
         glBindVertexArray(0)
+        #glDeleteBuffers(1, posVBO)
+        #glDeleteBuffers(1, colVBO)
+        #glDeleteBuffers(1, uvVBO)
+
 
     def paintGL(self):
         glClearColor(0, 0, 0, 1)
@@ -158,6 +144,7 @@ class MyWidget(QtOpenGL.QGLWidget):
 
         # activate shader program
         self._shaderProgram.bind()
+        self._shaderProgram.setUniformValue(self._use_color_location, 1.0)
         #loc = self._shaderProgram.uniformLocation("lolol")
         #self._shaderProgram.setUniformValue(loc, 1.0)
         self._shaderProgram.setUniformValue(self._mvpMatrixLocation, mpvMatrix)
