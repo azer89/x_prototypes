@@ -1,10 +1,26 @@
 
+
+"""
+radhitya@uwaterloo.ca
+
+A demo of Modern OpenGL.
+This code contains and approach of how to send uv, position, color data to GPU via VBO
+"""
+
+import sys
 import numpy
 from OpenGL.GL import *
 
+from PyQt4.QtGui import QWidget
+from PyQt4 import QtGui, QtCore
+
 from PyQt4 import QtGui, QtOpenGL
-from PyQt4.QtOpenGL import QGLShaderProgram, QGLShader
-from PyQt4.QtGui import QMatrix4x4
+
+from PyQt4.QtOpenGL import *
+from PyQt4.QtGui import *
+#from PyQt4.QtOpenGL import QGLShaderProgram, QGLShader
+#from PyQt4.QtGui import QMatrix4x4
+
 
 vertex_shader = """#version 330
 in vec2 uv;
@@ -23,6 +39,7 @@ void main()
     theColor = color;
 }
 """
+
 
 fragment_shader = """#version 330
 in vec2 theUV;
@@ -43,7 +60,20 @@ void main()
 }
 """
 
-class MyWidget(QtOpenGL.QGLWidget):
+
+class GLWidget(QtOpenGL.QGLWidget):
+    def __init__(self, parent = None):
+        if hasattr(QGLFormat, 'setVersion'):
+            # Modern OpenGL
+            f = QGLFormat()
+            f.setVersion(3, 3)
+            f.setProfile(QGLFormat.CoreProfile)
+            c = QGLContext(f, None)
+            QGLWidget.__init__(self, c, parent)
+            print "Version is set to 3.3"
+        else:
+            QGLWidget.__init__(self, parent)
+
 
     def initializeGL(self):
         glEnable(GL_DEPTH_TEST)
@@ -77,15 +107,14 @@ class MyWidget(QtOpenGL.QGLWidget):
                                   560.0, 400.0, 0.0, 1.0,
 
                                 # uv
-                                1.0, 0.0,
-                                1.0, 1.0,
-                                0.0, 1.0],
+                                0.0, 1.0,
+                                0.0, 0.0,
+                                1.0, 0.0],
                                 dtype = numpy.float32)
 
         colorData = numpy.array([1.0, 0.0, 0.0, 1.0,
                                  0.0, 0.0, 1.0, 1.0,
-                                 0.0, 1.0, 0.0, 1.0,
-                                 ],
+                                 0.0, 1.0, 0.0, 1.0],
                                  dtype = numpy.float32)
 
         # create VAO
@@ -97,10 +126,10 @@ class MyWidget(QtOpenGL.QGLWidget):
         glBindBuffer(GL_ARRAY_BUFFER, posVBO)
         glBufferData(GL_ARRAY_BUFFER, vertexData.nbytes, vertexData, GL_STATIC_DRAW)
         glEnableVertexAttribArray(self._vertexLocation)
-        glVertexAttribPointer(self._vertexLocation,   4, GL_FLOAT, GL_FALSE, 0, None)
+        glVertexAttribPointer(self._vertexLocation, 4, GL_FLOAT, GL_FALSE, 0, None)
 
         glEnableVertexAttribArray(self._texCoordLocation)
-        glVertexAttribPointer(self._texCoordLocation,    4, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(48))
+        glVertexAttribPointer(self._texCoordLocation, 2, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(48))
 
         # create VBO for color
         colVBO = glGenBuffers(1)
@@ -138,19 +167,63 @@ class MyWidget(QtOpenGL.QGLWidget):
         glBindVertexArray(0)
         glUseProgram(0)
 
+class GLContainer(QWidget):
+    """
+    Class GLContainer
+    """
+    def __init__(self):
+        super(GLContainer, self).__init__()
 
+        self.glWidget = GLWidget()
+
+        mainLayout = QtGui.QHBoxLayout()
+
+        mainLayout.addWidget(self.glWidget)
+        self.setLayout(mainLayout)
+
+        self.setWindowTitle("Hello GL")
+
+        QtCore.QCoreApplication.instance().aboutToQuit.connect( self.DeleteGLWidget )
+
+    def DeleteGLWidget(self):
+        print "QUIT"
+        self.glWidget.setParent(None)
+        del self.glWidget
+
+"""
 def main():
     import sys
 
     app = QtGui.QApplication(sys.argv)
 
-    glformat = QtOpenGL.QGLFormat()
-    glformat.setVersion(3, 3)
-    glformat.setProfile(QtOpenGL.QGLFormat.CoreProfile)
-    w = MyWidget(glformat)
+
+    #glformat = QtOpenGL.QGLFormat()
+    #glformat.setVersion(3, 3)
+    #glformat.setProfile(QtOpenGL.QGLFormat.CoreProfile)
+    #w = GLWidget(glformat)
+
+    w = GLWidget()
     w.resize(640, 480)
     w.show()
     sys.exit(app.exec_())
+"""
+
 
 if __name__ == '__main__':
-    main()
+    app_created = False
+
+    app = QtCore.QCoreApplication.instance()
+
+    if app is None:
+        app = QtGui.QApplication(sys.argv)
+        app_created = True
+
+    app.references = set()
+
+    window = GLContainer()
+    window.resize(640, 480)
+    app.references.add(window)
+    window.show()
+
+    if app_created:
+        app.exec_()
