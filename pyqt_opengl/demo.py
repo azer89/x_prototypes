@@ -190,24 +190,6 @@ class GLContainer(QWidget):
         self.glWidget.setParent(None)
         del self.glWidget
 
-"""
-def main():
-    import sys
-
-    app = QtGui.QApplication(sys.argv)
-
-
-    #glformat = QtOpenGL.QGLFormat()
-    #glformat.setVersion(3, 3)
-    #glformat.setProfile(QtOpenGL.QGLFormat.CoreProfile)
-    #w = GLWidget(glformat)
-
-    w = GLWidget()
-    w.resize(640, 480)
-    w.show()
-    sys.exit(app.exec_())
-"""
-
 
 if __name__ == '__main__':
     app_created = False
