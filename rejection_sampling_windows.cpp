@@ -1,9 +1,3 @@
-// RejectionSampling.cpp : Defines the entry point for the console application.
-
-// http://stackoverflow.com/questions/22975359/how-to-optimize-rejection-sampling (doesn't work in windows)
-// http://stackoverflow.com/questions/21959404/initialising-stddiscrete-distribution-in-vs2013 (solution)
-// http://ideone.com/351Jhg (solution)
-
 #include "stdafx.h"
 
 #include <iostream>
@@ -13,7 +7,6 @@
 template <typename T>
 class sampler
 {
-	//std::size_t i;
 	std::vector<T> keys;
 	std::discrete_distribution<T> distr;
 
@@ -24,8 +17,8 @@ public:
 
 		std::size_t i = 0;
 		this->distr = std::discrete_distribution<>(prob.size(),
-			0, // dummy!
-			1, // dummy!
+			0,
+			1,
 			[&prob, &i](float)
 		{			
 			auto w = prob[i];
@@ -34,8 +27,12 @@ public:
 		});
 
 	}
-	//sampler(const std::vector<T>& keys, const std::vector<float>& prob) :
-	//	keys(keys), distr(prob.begin(), prob.end()) { }
+	
+	/*
+	// If you use g++
+	sampler(const std::vector<T>& keys, const std::vector<float>& prob) :
+        keys(keys), distr(prob.begin(), prob.end()) { }
+	*/
 
 	T operator()()
 	{
@@ -65,4 +62,3 @@ int _tmain(int argc, _TCHAR* argv[])
 	std::getchar();
 	return 0;
 }
-
