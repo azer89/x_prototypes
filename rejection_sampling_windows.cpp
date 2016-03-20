@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include <iostream>
 #include <map>
 #include <random>
@@ -17,9 +15,9 @@ public:
 
 		std::size_t i = 0;
 		this->distr = std::discrete_distribution<>(prob.size(),
-			0,
-			1,
-			[&prob, &i](float)
+			0, // smaller value
+			1, // bigger value
+			[&prob, &i](float) // reference i by address
 		{			
 			auto w = prob[i];
 			++i;
