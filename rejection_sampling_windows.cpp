@@ -1,3 +1,9 @@
+// RejectionSampling.cpp : Defines the entry point for the console application.
+
+// http://stackoverflow.com/questions/22975359/how-to-optimize-rejection-sampling (doesn't work in windows)
+// http://stackoverflow.com/questions/21959404/initialising-stddiscrete-distribution-in-vs2013 (solution)
+// http://ideone.com/351Jhg (solution)
+
 #include <iostream>
 #include <map>
 #include <random>
@@ -9,6 +15,7 @@ class sampler
 	std::discrete_distribution<T> distr;
 
 public:
+	// this only works for visual c++
 	sampler(const std::vector<T>& keys, const std::vector<float>& prob)
 	{
 		this->keys = keys;
