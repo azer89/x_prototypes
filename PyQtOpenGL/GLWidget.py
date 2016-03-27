@@ -40,13 +40,13 @@ class GLWidget(QtOpenGL.QGLWidget):
         if hasattr(QGLFormat, "setVersion"):
             # Modern OpenGL
             f = QGLFormat()
-            f.setVersion(3, 3)
+            f.setVersion(3, 0)
             f.setProfile(QGLFormat.CoreProfile)
             f.setSampleBuffers(True)
             c = QGLContext(f, None)
 
             QGLWidget.__init__(self, c, parent)
-            print "Version is set to 3.3"
+            print "Version is set to 3.0"
         else:
             QGLWidget.__init__(self, parent)
 
