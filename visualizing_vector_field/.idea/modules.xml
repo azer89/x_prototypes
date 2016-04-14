@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/PyQtOpenGL.iml" filepath="$PROJECT_DIR$/.idea/PyQtOpenGL.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/visualizing_vector_field.iml" filepath="$PROJECT_DIR$/.idea/visualizing_vector_field.iml" />
     </modules>
   </component>
 </project>
