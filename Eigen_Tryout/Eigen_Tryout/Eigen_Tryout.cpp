@@ -30,6 +30,13 @@ int _tmain(int argc, _TCHAR* argv[])
 	Eigen::JacobiSVD<Eigen::Matrix2d> svd(m, Eigen::ComputeFullU | Eigen::ComputeFullV);
 	std::cout << "U = \n" << svd.matrixU() << "\n\n";
 	std::cout << "V = \n" << svd.matrixV() << "\n\n";
+	Vector2d sigmas = svd.singularValues();	
+	std::cout << "Sigma = \n" << sigmas << "\n\n";
+	std::cout << "Sigma = \n" << svd.singularValues() << "\n\n";
+	std::cout << "Sigma = \n" << sigmas(0) << "\n" << sigmas(1) << "\n\n";
+
+	Vector2d u_prime = (1.0 / sigmas(0)) * svd.matrixU() * u;
+	std::cout << "u_prime = \n" << u_prime << "\n\n";
 	
 	//std::cout << "Hello World\n";
 
