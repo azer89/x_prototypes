@@ -40,7 +40,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         if hasattr(QGLFormat, "setVersion"):
             # Modern OpenGL
             f = QGLFormat()
-            f.setVersion(3, 0)
+            f.setVersion(3, 3) # linux wants version 3.3, windows wants version 3.0
             f.setProfile(QGLFormat.CoreProfile)
             f.setSampleBuffers(True)
             c = QGLContext(f, None)
@@ -84,6 +84,9 @@ class GLWidget(QtOpenGL.QGLWidget):
         ### texture
         self.__ori_tex = self.bindTexture(QtGui.QPixmap("laughing_man.png"))
 
+        #testData = numpy.array([], dtype = numpy.float32)
+        #testData.append([   0.0,   0.0, 0.0, 1.0])
+
         vertexData = numpy.array([   0.0,   0.0, 0.0, 1.0,
                                      0.0, 250.0, 0.0, 1.0,
                                    250.0, 250.0, 0.0, 1.0,
@@ -101,6 +104,7 @@ class GLWidget(QtOpenGL.QGLWidget):
                                 1, 0,
                                 1, 1],
                                 dtype = numpy.float32)
+
 
         colorData = numpy.array([1.0, 0.0, 0.0, 1.0,
                                  0.0, 0.0, 1.0, 1.0,
