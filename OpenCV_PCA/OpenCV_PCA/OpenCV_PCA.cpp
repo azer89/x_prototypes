@@ -6,25 +6,42 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
+#include "AVector.h"
+#include "AShape.h"
+#include "UtilityFunctions.h"
+#include "dirent.h"
+
 //using namespace std;
 //using namespace cv;
 
-// Function declarations
+/*
+================================================================================
+DATA
+================================================================================
+*/
+std::vector<AShape> _shapes;
+
+/*
+================================================================================
+Function declarations
+================================================================================
+*/
 void drawAxis(cv::Mat&, cv::Point, cv::Point, cv::Scalar, const float);
 double getOrientation(const std::vector<cv::Point> &, cv::Mat&);
 
-/**
-* @function drawAxis
+/*
+================================================================================
+Function drawAxis
+================================================================================
 */
 void drawAxis(cv::Mat& img, cv::Point p, cv::Point q, cv::Scalar colour, const float scale = 0.2)
 {
-	//! [visualization1]
 	double angle;
 	double hypotenuse;
 	angle = atan2((double)p.y - q.y, (double)p.x - q.x); // angle in radians
 	hypotenuse = sqrt((double)(p.y - q.y) * (p.y - q.y) + (p.x - q.x) * (p.x - q.x));
-	//    double degrees = angle * 180 / CV_PI; // convert radians to degrees (0-180 range)
-	//    cout << "Degrees: " << abs(degrees - 180) << endl; // angle in 0-360 degrees range
+	// double degrees = angle * 180 / CV_PI; // convert radians to degrees (0-180 range)
+	// cout << "Degrees: " << abs(degrees - 180) << endl; // angle in 0-360 degrees range
 
 	// Here we lengthen the arrow by a factor of scale
 	q.x = (int)(p.x - scale * hypotenuse * cos(angle));
@@ -39,11 +56,13 @@ void drawAxis(cv::Mat& img, cv::Point p, cv::Point q, cv::Scalar colour, const f
 	p.x = (int)(q.x + 9 * cos(angle - CV_PI / 4));
 	p.y = (int)(q.y + 9 * sin(angle - CV_PI / 4));
 	line(img, p, q, colour, 1, CV_AA);
-	//! [visualization1]
 }
 
-/**
-* @function getOrientation
+
+/*
+================================================================================
+Function getOrientation
+================================================================================
 */
 double getOrientation(const std::vector<cv::Point> &pts, cv::Mat &img)
 {
@@ -84,10 +103,13 @@ double getOrientation(const std::vector<cv::Point> &pts, cv::Mat &img)
 }
 
 
-
+/*
+================================================================================
+================================================================================
+*/
 int _tmain(int argc, _TCHAR* argv[])
 {
-	//! [pre-process]
+
 	// Load image
 	cv::Mat src = cv::imread("pca_test4.jpg");
 	//Mat src = imread(argv[1]);
@@ -97,7 +119,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		std::cout << "Problem loading image!!!" << std::endl;
 		return EXIT_FAILURE;
 	}
-	//imshow("src", src);
+	imshow("src", src);
+
+	/*
 	// Convert image to grayscale
 	cv::Mat gray;
 	cvtColor(src, gray, cv::COLOR_BGR2GRAY);
@@ -125,6 +149,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		getOrientation(contours[i], src);
 	}
 	cv::imshow("output", src);
+	*/
+
 	cv::waitKey(0);
 	return 0;
 }
