@@ -19,7 +19,8 @@
 DATA
 ================================================================================
 */
-std::vector<AShape> _shapes;
+//std::vector<AShape> _shapes;
+std::vector<std::string> _fileStr;
 
 /*
 ================================================================================
@@ -28,6 +29,43 @@ Function declarations
 */
 void drawAxis(cv::Mat&, cv::Point, cv::Point, cv::Scalar, const float);
 double getOrientation(const std::vector<cv::Point> &, cv::Mat&);
+void LoadShapes();
+
+/*
+================================================================================
+LoadShapes
+================================================================================
+*/
+void LoadShapes()
+{
+	/*===== Stuff =====*/
+	//MomentsCalculator* mCalculator = new MomentsCalculator();
+	//PathIO* pathIO = new PathIO();
+
+	/*===== clear =====*/
+	//_shapes.clear();
+
+	/*=====  dirent =====*/
+	DIR *dp;
+	struct dirent *ep;
+
+	//std::vector<std::string> fileStr;
+	std::string directoryPath = "D:\\Code\\GeometricMoments\\Bunnies";
+	dp = opendir(directoryPath.c_str());
+	if (dp != NULL)
+	{
+		while (ep = readdir(dp)) { _fileStr.push_back(ep->d_name); }
+		(void)closedir(dp);
+	}
+	else { perror("Couldn't open the directory"); }
+
+	for (int a = 0; a < _fileStr.size(); a++)
+	{
+		if (_fileStr[a] == "." || _fileStr[a] == "..") { continue; }
+		std::string fileName = directoryPath + "\\" + _fileStr[a];
+		std::cout << "filepath: " << fileName << "\n";
+	}
+}
 
 /*
 ================================================================================
@@ -109,7 +147,7 @@ double getOrientation(const std::vector<cv::Point> &pts, cv::Mat &img)
 */
 int _tmain(int argc, _TCHAR* argv[])
 {
-
+	/*
 	// Load image
 	cv::Mat src = cv::imread("pca_test4.jpg");
 	//Mat src = imread(argv[1]);
@@ -120,6 +158,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		return EXIT_FAILURE;
 	}
 	imshow("src", src);
+	*/
 
 	/*
 	// Convert image to grayscale
