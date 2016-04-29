@@ -1,5 +1,3 @@
-// OpenCV_PCA.cpp : Defines the entry point for the console application.
-// http://docs.opencv.org/3.0-rc1/d1/dee/tutorial_introduction_to_pca.html
 
 #include "stdafx.h"
 
@@ -11,9 +9,6 @@
 #include "AShape.h"
 #include "UtilityFunctions.h"
 #include "dirent.h"
-
-//using namespace std;
-//using namespace cv;
 
 /*
 ================================================================================
@@ -32,29 +27,21 @@ Function declarations
 */
 void drawAxis(cv::Mat&, cv::Point, cv::Point, cv::Scalar, const float);
 double getOrientation(const std::vector<cv::Point> &, cv::Mat&);
-void LoadShapes();
+void LoadFiles();
 void DrawPolygon(cv::Mat& drawing, std::vector<AVector> shape_contours, cv::Scalar color, float xOffset = 0, float yOffset = 0);
 
 /*
 ================================================================================
-LoadShapes
+LoadFiles
 ================================================================================
 */
-void LoadShapes()
+void LoadFiles()
 {
-	/*===== Stuff =====*/
-	//MomentsCalculator* mCalculator = new MomentsCalculator();
-	//PathIO* pathIO = new PathIO();
-
-	/*===== clear =====*/
-	//_shapes.clear();
-
 	/*=====  dirent =====*/
 	DIR *dp;
 	struct dirent *ep;
 
-	//std::vector<std::string> fileStr;
-	//std::string directoryPath = "D:\\Code\\x_prototypes\\OpenCV_PCA\\OpenCV_PCA\\Bunnies";
+	/*===== open directory =====*/
 	dp = opendir(_directoryPath.c_str());
 	if (dp != NULL)
 	{
@@ -62,13 +49,6 @@ void LoadShapes()
 		(void)closedir(dp);
 	}
 	else { perror("Couldn't open the directory"); }
-
-	/*for (int a = 0; a < _fileStr.size(); a++)
-	{
-		if (_fileStr[a] == "." || _fileStr[a] == "..") { continue; }
-		std::string fileName = directoryPath + "\\" + _fileStr[a];
-		std::cout << "filepath: " << fileName << "\n";
-	}*/
 }
 
 /*
@@ -106,7 +86,6 @@ void drawAxis(cv::Mat& img, cv::Point p, cv::Point q, cv::Scalar colour, const f
 Function getOrientation
 ================================================================================
 */
-//double getOrientation(const std::vector<cv::Point> &pts, cv::Mat &img)
 double getOrientation(const std::vector<AVector> &pts, cv::Mat &img)
 {
 	//Construct a buffer used by the pca analysis
@@ -187,91 +166,48 @@ void DrawPolygon(cv::Mat& drawing, std::vector<AVector> shape_contours, cv::Scal
 */
 int _tmain(int argc, _TCHAR* argv[])
 {
+	// for reading txt files
 	PathIO* pathIO = new PathIO();
-	//cv::Mat drawing = cv::Mat::zeros(cv::Size(1000, 1000), CV_8UC3);
+
+	// this vector contains the list of images
 	std::vector<cv::Mat> drawings;
 
-	LoadShapes();
+	// Load files
+	LoadFiles();
 
 	cv::RNG rng(12345);
 	for (int a = 0; a < _fileStr.size(); a++)
 	{
+		// is path valid?
 		if (_fileStr[a] == "." || _fileStr[a] == "..") { continue; }
 		std::string fileName = _directoryPath + "\\" + _fileStr[a];
 		std::cout << "filepath: " << fileName << "\n";
 
+		// load contour from txt file
 		std::vector<AVector> ori_contour;
 		std::vector<AShape> shapes = pathIO->LoadPath(fileName);
 		ori_contour = shapes[0].shape_contours;
 		std::vector<AVector> shape_contour;
 		UtilityFunctions::UniformResample(ori_contour, shape_contour, 1000);
 
-
-		//if (a == 4)
-		//{
+		// calculate PCA
 		cv::Mat drawing = cv::Mat::zeros(cv::Size(1000, 1000), CV_8UC3);
 		getOrientation(shape_contour, drawing);
 
+		// draw polygon
 		cv::Scalar color = cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
 		DrawPolygon(drawing, shape_contour, color);
 
+		// store the image
 		drawings.push_back(drawing);
-		//}
 	}
-
-	/*
-	// Load image
-	cv::Mat src = cv::imread("pca_test4.jpg");
-	//Mat src = imread(argv[1]);
-	// Check if image is loaded successfully
-	if (!src.data || src.empty())
-	{
-		std::cout << "Problem loading image!!!" << std::endl;
-		return EXIT_FAILURE;
-	}
-	imshow("src", src);
-	*/
-
-	/*
-	// Convert image to grayscale
-	cv::Mat gray;
-	cvtColor(src, gray, cv::COLOR_BGR2GRAY);
-	
-	// Convert image to binary
-	cv::Mat bw;
-	threshold(gray, bw, 50, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-	//! [pre-process]
-
-	//imshow("bw", bw);	
-	//! [contours]
-	// Find all the contours in the thresholded image
-	std::vector<cv::Vec4i> hierarchy;
-	std::vector<std::vector<cv::Point> > contours;
-	findContours(bw, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
-
-	for (size_t i = 0; i < contours.size(); ++i)
-	{		
-		double area = contourArea(contours[i]);	// Calculate the area of each contour		
-		if (area < 1e2 || 1e5 < area) { continue; }	// Ignore contours that are too small or too large
-
-		// Draw each contour only for visualisation purposes
-		drawContours(src, contours, static_cast<int>(i), cv::Scalar(0, 0, 255), 2, 8, hierarchy, 0);
-		// Find the orientation of each shape
-		getOrientation(contours[i], src);
-	}
-	cv::imshow("output", src);
-	*/
 
 	for (size_t a = 0; a < drawings.size(); a++)
 	{
 		std::string title = "drawing " + std::to_string(a);
-		//cv::namedWindow(title.c_str(), CV_WINDOW_NORMAL); // CV_WINDOW_AUTOSIZE
-		cv::namedWindow(title.c_str(), CV_WINDOW_AUTOSIZE);
+		cv::namedWindow(title.c_str(), CV_WINDOW_AUTOSIZE); // CV_WINDOW_NORMAL, CV_WINDOW_AUTOSIZE
 		cv::imshow(title.c_str(), drawings[a]);
 	}
-
-	//cv::namedWindow("DRAWING", CV_WINDOW_NORMAL);
-	//cv::imshow("DRAWING", drawing);
 
 	cv::waitKey(0);
 
