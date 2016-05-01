@@ -17,6 +17,7 @@ struct AShape
 	//MyMoments shape_moments;
 	//std::vector<cv::Point2f> shape_contours;
 	std::vector<AVector> shape_contours;
+	AVector center;
 	//double hu[7];	// hu moments
 	std::string filepath = "";
 	cv::Mat img;

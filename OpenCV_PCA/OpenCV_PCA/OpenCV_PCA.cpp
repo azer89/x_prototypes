@@ -151,17 +151,15 @@ void DrawPolygon(cv::Mat& drawing, std::vector<AVector> shape_contours, cv::Scal
 			(shape_contours[b].y + yOffset)));
 	}
 
-
 	for (size_t b = 0; b < new_contours.size() - 1; b++)
-	{
-		cv::line(drawing, new_contours[b], new_contours[b + 1], color, _line_thickness);
-	}
+		{ cv::line(drawing, new_contours[b], new_contours[b + 1], color, _line_thickness); }
 	cv::line(drawing, new_contours[new_contours.size() - 1], new_contours[0], color, _line_thickness);
 }
 
 
 /*
 ================================================================================
+Main function
 ================================================================================
 */
 int _tmain(int argc, _TCHAR* argv[])
@@ -181,22 +179,23 @@ int _tmain(int argc, _TCHAR* argv[])
 		// is path valid?
 		if (_fileStr[a] == "." || _fileStr[a] == "..") { continue; }
 		std::string fileName = _directoryPath + "\\" + _fileStr[a];
-		std::cout << "filepath: " << fileName << "\n";
+		std::cout << "filepath: " << fileName << "\n"; // print the name
 
 		// load contour from txt file
 		std::vector<AVector> ori_contour;
 		std::vector<AShape> shapes = pathIO->LoadPath(fileName);
-		ori_contour = shapes[0].shape_contours;
-		std::vector<AVector> shape_contour;
-		UtilityFunctions::UniformResample(ori_contour, shape_contour, 1000);
+		AShape theShape = shapes[0];
+		ori_contour = theShape.shape_contours;
+		//std::vector<AVector> shape_contour;
+		UtilityFunctions::UniformResample(ori_contour, theShape.shape_contours, 1000);
 
 		// calculate PCA
 		cv::Mat drawing = cv::Mat::zeros(cv::Size(1000, 1000), CV_8UC3);
-		getOrientation(shape_contour, drawing);
+		getOrientation(theShape.shape_contours, drawing);
 
 		// draw polygon
 		cv::Scalar color = cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-		DrawPolygon(drawing, shape_contour, color);
+		DrawPolygon(drawing, theShape.shape_contours, color);
 
 		// store the image
 		drawings.push_back(drawing);
