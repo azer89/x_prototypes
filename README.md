@@ -5,3 +5,7 @@
 **pyqt_experiments/show_svg.py** Render SVG files using PyQt
 
 **pyqt_experiments/show_window.py** Displaying a simple PyQT window
+
+**OpenCV_PCA** Testing PCA using OpenCV and C++
+
+**Eigen_Tryout** testing C++ Eigen
