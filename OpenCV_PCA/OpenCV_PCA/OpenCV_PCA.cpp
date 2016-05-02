@@ -26,7 +26,8 @@ Function declarations
 ================================================================================
 */
 void drawAxis(cv::Mat&, cv::Point, cv::Point, cv::Scalar, const float);
-double getOrientation(const std::vector<cv::Point> &, cv::Mat&);
+//double getOrientation(const std::vector<cv::Point> &, cv::Mat&);
+double getOrientation(AShape&, cv::Mat&);
 void LoadFiles();
 void DrawPolygon(cv::Mat& drawing, std::vector<AVector> shape_contours, cv::Scalar color, float xOffset = 0, float yOffset = 0);
 
@@ -86,15 +87,16 @@ void drawAxis(cv::Mat& img, cv::Point p, cv::Point q, cv::Scalar colour, const f
 Function getOrientation
 ================================================================================
 */
-double getOrientation(const std::vector<AVector> &pts, cv::Mat &img)
+//double getOrientation(const std::vector<AVector> &pts, cv::Mat &img)
+double getOrientation(AShape& aShape, cv::Mat &img)
 {
 	//Construct a buffer used by the pca analysis
-	int sz = static_cast<int>(pts.size());
+	int sz = static_cast<int>(aShape.shape_contours.size());
 	cv::Mat data_pts = cv::Mat(sz, 2, CV_64FC1);
 	for (int i = 0; i < data_pts.rows; ++i)
 	{
-		data_pts.at<double>(i, 0) = pts[i].x;
-		data_pts.at<double>(i, 1) = pts[i].y;
+		data_pts.at<double>(i, 0) = aShape.shape_contours[i].x;
+		data_pts.at<double>(i, 1) = aShape.shape_contours[i].y;
 	}
 
 	//Perform PCA analysis
@@ -186,12 +188,12 @@ int _tmain(int argc, _TCHAR* argv[])
 		std::vector<AShape> shapes = pathIO->LoadPath(fileName);
 		AShape theShape = shapes[0];
 		ori_contour = theShape.shape_contours;
-		//std::vector<AVector> shape_contour;
 		UtilityFunctions::UniformResample(ori_contour, theShape.shape_contours, 1000);
 
 		// calculate PCA
 		cv::Mat drawing = cv::Mat::zeros(cv::Size(1000, 1000), CV_8UC3);
-		getOrientation(theShape.shape_contours, drawing);
+		//getOrientation(theShape.shape_contours, drawing);
+		getOrientation(theShape, drawing);
 
 		// draw polygon
 		cv::Scalar color = cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
