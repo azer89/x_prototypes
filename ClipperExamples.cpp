@@ -103,3 +103,52 @@ AVector ShapeRadiusMatching::FindTheFarthestIntersection(ALine line, std::vector
 	return intersectPt;
 	
 }
+
+
+/*
+================================================================================
+================================================================================
+*/
+AVector ShapeRadiusMatching::FindTheFarthestIntersection(ALine line, std::vector<AVector> shape)
+{
+	AVector endPt = line.GetPointB(); // the endpoint, because clipper thinks a closed path is also a *filled* path
+	AVector intersectPt;
+
+	float cScaling = 1e10; // because clipper only uses integer
+
+	ClipperLib::Path cShape;
+	ClipperLib::Path cLine;
+	ClipperLib::PolyTree sol;
+
+	for (int a = 0; a < shape.size(); a++)
+	{ cShape << ClipperLib::IntPoint(shape[a].x * cScaling, shape[a].y * cScaling); }
+
+	cLine << ClipperLib::IntPoint(line.XA * cScaling, line.YA * cScaling) << ClipperLib::IntPoint(line.XB * cScaling, line.YB * cScaling);
+
+	ClipperLib::Clipper myClipper;
+	myClipper.AddPath(cShape, ClipperLib::ptClip, true);    // closed shape should be the clipper
+	myClipper.AddPath(cLine, ClipperLib::ptSubject, false); // line must be subject
+	myClipper.Execute(ClipperLib::ctIntersection, sol, ClipperLib::pftNonZero, ClipperLib::pftNonZero);
+
+	ClipperLib::Paths pSol;
+	ClipperLib::PolyTreeToPaths(sol, pSol);
+
+	float dist = std::numeric_limits<float>::max();
+	for (int a = 0; a < pSol.size(); a++)
+	{
+		for (int b = 0; b < pSol[a].size(); b++)
+		{
+			int xCoord = pSol[a][b].X / cScaling;
+			int yCoord = pSol[a][b].Y / cScaling;
+			AVector iPt(xCoord, yCoord);
+			float d = endPt.Distance(iPt);
+			if (d < dist)
+			{
+				dist = d;
+				intersectPt = iPt;
+			}
+		}
+	}
+
+	return intersectPt;
+}
