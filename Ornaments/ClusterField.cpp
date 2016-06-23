@@ -1,3 +1,10 @@
+// clustering
+
+std::vector<std::vector<ALine>>   _clusterFieldLines;
+std::vector<std::vector<AVector>> _resampledFieldLines;
+std::vector<std::vector<AVector>> _clusters;
+
+
 // originally used in VFDRegionWrapper.cpp
 
 
