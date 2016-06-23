@@ -97,3 +97,54 @@ void VFDRegionWrapper::ClusterField()
 	// ===== knn =====
 	//NANOFLANNWrapper knn;
 }
+
+float UtilityFunctions::AverageLinkageDistance(std::vector<AVector> poly1, std::vector<AVector> poly2)
+{
+	float dist = 0;
+	for (int a = 0; a < poly1.size(); a++)
+	{
+		for (int b = 0; b < poly2.size(); b++)
+		{
+			float spatialDist = poly1[a].Distance(poly2[b]);
+			float angleDif = std::abs(poly1[a].radAngle - poly2[b].radAngle);
+
+			float d = angleDif;
+
+			//if (d < dist) { dist = d; }
+			dist += d;
+		}
+	}
+
+	dist = dist / (float)(poly1.size() * poly2.size());
+
+	return dist;
+}
+
+// Brute force
+float UtilityFunctions::SingleLinkageDistance(std::vector<AVector> poly1, std::vector<AVector> poly2)
+{
+	float dist = std::numeric_limits<float>::max();
+	for (int a = 0; a < poly1.size(); a++)
+	{
+		for (int b = 0; b < poly2.size(); b++)
+		{
+			/*if (poly1[a].radAngle < std::numeric_limits<float>::epsilon() && poly1[a].radAngle > -std::numeric_limits<float>::epsilon())
+			{
+				std::cout << ".";
+			}
+			else
+			{
+				std::cout << "#";
+			}*/
+	
+			float spatialDist = poly1[a].Distance(poly2[b]);
+			float angleDif = std::abs(poly1[a].radAngle - poly2[b].radAngle);
+			//std::cout << spatialDist << "***";
+			//float d = spatialDist + angleDif * 0.008f;
+			float d = angleDif + spatialDist * 0.01f;
+			//float d = spatialDist;
+			if (d < dist) { dist = d; }
+		}
+	}
+	return dist;
+}
