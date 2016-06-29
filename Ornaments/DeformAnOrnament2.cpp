@@ -1,3 +1,7 @@
+/*
+================================================================================
+================================================================================
+*/
 std::vector<std::vector<AVector>> ShapeRadiusMatching::DeformAnOrnament2(std::vector<APath> oPaths,
 															             std::vector<AVector> oSkeleton, 
 																	     PairFunctions oFunction,
@@ -10,6 +14,7 @@ std::vector<std::vector<AVector>> ShapeRadiusMatching::DeformAnOrnament2(std::ve
 	std::vector<std::vector<AVector>> vvsPt;
 	std::vector<std::vector<AVector>> vvDir;
 	std::vector<std::vector<float>>   vvDist;
+	//std::vector<std::vector<bool>>    vvDist;
 
 	// ===== get max, shrink factor, and copy =====
 	float oMax = oFunction._maxVal;
@@ -50,25 +55,14 @@ std::vector<std::vector<AVector>> ShapeRadiusMatching::DeformAnOrnament2(std::ve
 
 			AVector sPt = UtilityFunctions::GetPointInterpolationFromStart(bResampledAxis, normDist);	   // this is interpolated point on the streamline
 
-			// which index ?
-			int funcIndex = (float)SystemParams::_function_length * normDist;
-			if (funcIndex < 0) { funcIndex = 0; }
-			else if (funcIndex >= SystemParams::_function_length) { funcIndex = SystemParams::_function_length - 1; }
-
-			float dist = closestPt.Distance(pt);
-
-			// left or right ?
-			std::vector<AVector> dirs(2);
-			dirs[0] = lDirs[funcIndex];
-			dirs[1] = rDirs[funcIndex];
-			std::vector<float> vals(2);
-			vals[0] = oFunction._leftFunction[funcIndex];
-			vals[1] = oFunction._rightFunction[funcIndex];
+			// size = 2
+			std::vector<AVector> dirs = GetInterPolatedLRDirs(normDist, lDirs, rDirs);
 
 			int idx = 0;
 			if (pt.x > closestPt.x) { idx = 1; }  // right
 			if (shouldLRFLip) { idx = 1 - idx; }; // flip LR
 
+			float dist = closestPt.Distance(pt);
 			AVector newPt = sPt + dirs[idx] * shrinkFactor * dist * 0.5f;
 
 			newBoundary.push_back(newPt); // push
@@ -82,8 +76,9 @@ std::vector<std::vector<AVector>> ShapeRadiusMatching::DeformAnOrnament2(std::ve
 		vvDist.push_back(vDist);
 	}
 
-	//float warpFactor = 0.5f;
-	//float maxExp = std::exp(1.0f/warpFactor) - 1.0;
+	float warpFactor = 0.2f;
+	//float expFactor = 0.01f;
+	//float maxExp = std::exp(1.0f / expFactor) - 1.0;
 	for (int a = 0; a < newBoundaries.size(); a++)
 	{
 		//std::vector<AVector> newBoundary = newBoundaries[a];
@@ -100,19 +95,19 @@ std::vector<std::vector<AVector>> ShapeRadiusMatching::DeformAnOrnament2(std::ve
 				AVector oriPt = newBoundaries[a][b];
 				AVector dir = (intersectPt - oriPt).Norm();
 				float dist1 = oriPt.Distance(intersectPt);
-				float dist2 = vsPt[b].Distance(intersectPt);
-				float normDist = dist1 / dist2;
+				//float dist2 = vsPt[b].Distance(intersectPt);
+				//float normDist = dist1 / dist2;
 
-				//float val = std::exp(normDist / warpFactor) - 1.0;
+				//float val = std::exp(normDist / expFactor) - 1.0;
 				//val /= maxExp;
 
 				//std::cout << val << "   ";
 
 				//if (val > )
 				//newBoundaries[a][b] = oriPt + dir * dist2 * val;
-				newBoundaries[a][b] = oriPt + dir * dist2 * normDist;
+				//newBoundaries[a][b] = oriPt + dir * dist2 * normDist;
 
-				//newBoundaries[a][b] = oriPt + dir * dist* warpFactor;
+				newBoundaries[a][b] = oriPt + dir * dist1 * warpFactor/* val */;
 			}
 		}
 	}
