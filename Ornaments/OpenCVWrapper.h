@@ -1,18 +1,33 @@
 
+/*
+================================================================================
+Reza Adhitya Saputra
+radhitya@uwaterloo.ca
+================================================================================
+*/
+
 #ifndef OPENCV_WRAPPER
 #define OPENCV_WRAPPER
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
 #include <unordered_map>
 
 #include "AVector.h"
 
+/*
+enum ImageType
+{
+	BGR255 = CV_8UC3,
+};*/
 
 #define BGR_255 CV_8UC3
 
+/*
+================================================================================
+================================================================================
+*/
 struct MyColor
 {
 public:
@@ -26,9 +41,20 @@ public:
 		this->_g = g;
 		this->_b = b;
 	}
+
+	MyColor(int val)
+	{
+		this->_r = val;
+		this->_g = val;
+		this->_b = val;
+	}
 };
 
-// wrapper for cv::Mat
+/*
+================================================================================
+wrapper for cv::Mat
+================================================================================
+*/
 struct CVImg
 {
 public:
@@ -102,8 +128,11 @@ public:
 
 };
 
-
-// OpenCV Rendering
+/*
+================================================================================
+OpenCV Rendering
+================================================================================
+*/
 class OpenCVWrapper
 {
 public:
@@ -126,44 +155,67 @@ public:
 	void SetPixel(std::string imageName, int x, int y, MyColor col);
 	int GetNumColumns(std::string imageName);
 	int GetNumRows(std::string imageName);
-
+	
 	void WaitKey();
+
+	// point polygon test
+	template <typename T>
+	float PointPolygonTest(std::vector<T> shape_contours, T pt);
 
 	//void line(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
 	template <typename T>
-	void DrawLine(std::string imageName, T pt1, T pt2, MyColor color, int thickness);
+	void DrawLine(std::string imageName, T pt1, T pt2, MyColor color, int thickness, float scale = 1.0f);
 
-	void PutText(std::string imageName, std::string text, AVector pos, MyColor col, float scale = 0.5f, float thickness = 1)
+	void PutText(std::string imageName, std::string text, AVector pos, MyColor col, float scale= 0.5f, float thickness = 1)
 	{
 		cv::Mat img = _images[imageName];
 		cv::putText(img, text, cv::Point(pos.x, pos.y), cv::FONT_HERSHEY_SIMPLEX, scale, cv::Scalar(col._b, col._g, col._r), thickness);
 	}
 
 	// drawing
+
+	void DrawCircle(std::string imageName, AVector pt, MyColor col, float radius)
+	{
+		cv::Mat drawing = _images[imageName];
+		cv::circle(drawing, cv::Point(pt.x, pt.y), radius, cv::Scalar(col._b, col._g, col._r), -1);
+	}
+
+	std::vector<cv::Point2f> ConvertAVectorToCvPoint2f(std::vector<AVector> contour);
+
+	template <typename T>
+	void DrawPolyOnCVImage(cv::Mat img,
+						   std::vector<T> shape_contours,
+						   MyColor color,
+						   bool isClosed,
+						   float thickness = 1.0f,
+						   float scale = 1.0f,
+						   float xOffset = 0,
+						   float yOffset = 0);
+
 	template <typename T>
 	void DrawPoly(std::string imageName,
-					std::vector<T> shape_contours,
-					MyColor color,
-					bool isClosed,
-					float thickness = 1.0f,
-					float scale = 1.0f,
-					float xOffset = 0,
-					float yOffset = 0);
+				  std::vector<T> shape_contours, 
+				  MyColor color,
+				  bool isClosed, 
+				  float thickness = 1.0f,
+				  float scale = 1.0f,
+				  float xOffset = 0, 
+				  float yOffset = 0);
 
 	template <typename T>
 	void DrawRetranslatedPoly(std::string imageName,
-							std::vector<T> shape_contours,
-							std::vector<T> medial_axis,
-							MyColor color,
-							float thickness = 1.0f,
-							float scale = 1.0f);
+							  std::vector<T> shape_contours, 
+							  std::vector<T> medial_axis, 
+							  MyColor color,
+							  float thickness = 1.0f,
+							  float scale = 1.0f);
 
 	template <typename T>
 	void DrawFilledPoly(std::string imageName,
-						std::vector<T> shape_contours,
+						std::vector<T> shape_contours, 
 						MyColor color,
 						float scale = 1.0f,
-						float xOffset = 0,
+						float xOffset = 0, 
 						float yOffset = 0);
 };
 
