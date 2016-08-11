@@ -1,5 +1,7 @@
 /*
 ================================================================================
+DON'T USE THIS FUNCTION!
+What is this function trying to do?
 ================================================================================
 */
 void ShapeRadiusMatching::ProcessBlobs2()
@@ -14,7 +16,9 @@ void ShapeRadiusMatching::ProcessBlobs2()
 	{
 		_blobs[a].MakeClockwise();
 		if (!_blobs[a]._isFocalElement)
-			{ _blobs[a]._streamLine = ExtendStreamline(_blobs[a]); }
+		{ 
+			_blobs[a]._streamLine = _lineTracer.ExtendStreamline(&_ornamentRegions[_blobs[a]._whatRegion], _blobs[a]);
+		}
 	}
 	// ===== calculate pair functions =====
 	for (int a = 0; a < _blobs.size(); a++)
@@ -24,11 +28,11 @@ void ShapeRadiusMatching::ProcessBlobs2()
 		_blobs[a]._pFunctions = ProcessABlob(_blobs[a], a, _blobs, ss.str());
 	}
 	// ===== Snap streamline =====
-	for (int a = 0; a < _blobs.size(); a++)
+	/*for (int a = 0; a < _blobs.size(); a++)
 	{
-		if (_blobs[a]._pFunctions.GetLeftMean() < 0.1f || _blobs[a]._pFunctions.GetRightMean() < 0.1f)
+		if ((_blobs[a]._pFunctions.GetLeftMean() < 0.1f || _blobs[a]._pFunctions.GetRightMean() < 0.1f) && !_blobs[a]._isFocalElement )
 			{ std::cout << "snap\n"; _blobs[a]._streamLine = SnapStreamline(_blobs[a]); }
-	}
+	}*/
 	// ===== create masks =====
 	std::cout << "Create masks\n";
 	_blobEngine.CreateRegionMasks(_regions);
@@ -146,8 +150,10 @@ void ShapeRadiusMatching::ProcessBlobs2()
 	}
 
 	// ===== save to SVG =====
-	MySVGRenderer::SaveOrnamentsToSVG(SystemParams::_image_folder + _artName + ".svg", deformedOrnaments);
+	//MySVGRenderer::SaveOrnamentsToSVG(SystemParams::_image_folder + _artName + ".svg", deformedOrnaments);
+	MySVGRenderer::SaveOrnamentsToSVG(SystemParams::_image_folder + _artName + ".svg", artDataArray);
 
 	// ===== Display ornaments and blobs =====	
-	DisplayOrnaments(deformedOrnaments, _blobs);
+	//DisplayOrnaments(deformedOrnaments, _blobs);
+	DisplayOrnaments(artDataArray, _blobs);
 }
